@@ -22,6 +22,7 @@ class MeetingRoomCalendarController < ApplicationController
     @custom_field_id_room = Setting['plugin_redmine_meeting_room_calendar']['custom_field_id_room']
     @custom_field_id_start = Setting['plugin_redmine_meeting_room_calendar']['custom_field_id_start']
     @custom_field_id_end = Setting['plugin_redmine_meeting_room_calendar']['custom_field_id_end']
+    @custom_field_id_uchastniki = Setting['plugin_redmine_meeting_room_calendar']['custom_field_id_uchastniki']
     @issue_status_id = Setting['plugin_redmine_meeting_room_calendar']['issue_status_id']
     @show_categories = Setting['plugin_redmine_meeting_room_calendar']['show_categories']
     @allow_changing_old_meetings = Setting['plugin_redmine_meeting_room_calendar']['allow_changing_old_meetings'] || 0
@@ -35,6 +36,7 @@ class MeetingRoomCalendarController < ApplicationController
       @start_time = CustomField.find_by_id(@custom_field_id_start).possible_values
       @end_time =  CustomField.find_by_id(@custom_field_id_end).possible_values
       @meeting_rooms = CustomField.find_by_id(@custom_field_id_room).possible_values
+      @meeting_uchastniki = CustomField.find_by_id(@custom_field_id_uchastniki).possible_values #добавка
     end
 
     if Rails::VERSION::MAJOR < 3
@@ -140,6 +142,7 @@ class MeetingRoomCalendarController < ApplicationController
         @calendar_issue.subject = params[:subject]
         @calendar_issue.author_id = params[:author_id]
         @calendar_issue.assigned_to_id = params[:assigned_to_id]
+      
         if @show_categories
           @calendar_issue.category_id = params[:category_id]
         end
@@ -198,7 +201,7 @@ class MeetingRoomCalendarController < ApplicationController
     @calendar_issue.tracker_id = @tracker_id
     @calendar_issue = Issue.find(params[:event_id])
     @calendar_issue.subject = params[:subject]
-    @calendar_issue.assigned_to_id = params[:assigned_to_id]
+    @calendar_issue.assigned_to_id = params[:assigned_to_id]    
     if @show_categories
       @calendar_issue.category_id = params[:category_id]
     end
@@ -254,6 +257,9 @@ class MeetingRoomCalendarController < ApplicationController
       return false
     end
     if @custom_field_id_end == nil || @custom_field_id_end.to_s == '0' || @custom_field_id_end.to_s == ''
+      return false
+    end
+    if @custom_field_id_uchastniki == nil || @custom_field_id_uchastniki.to_s == '0' || @custom_field_id_uchastniki.to_s == ''
       return false
     end
 

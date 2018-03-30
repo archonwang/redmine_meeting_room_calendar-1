@@ -16,6 +16,7 @@
 	var fieldIdRoom = "<%= @custom_field_id_room %>";
 	var fieldIdStart = "<%= @custom_field_id_start %>";
 	var fieldIdEnd = "<%= @custom_field_id_end %>";
+	var fieldIdUchastniki = "<%= @custom_field_id_uchastniki %>";
 	
 	var pluginName = "meeting_room_calendar";
 
@@ -57,9 +58,12 @@
 	var langInvalidSubject = "<%= l(:label_invalid_subject) %>";
 	var langRoomAlreadyBooked = "<%= l(:label_room_already_booked) %>";
 	var langRoom = "<%= l(:label_meeting_room) %>";
+	var langUchastniki = "<%= l(:label_meeting_uchastniki) %>";
+
 	
 	var tracker_name = "<%= Tracker.find(@tracker_id).name %>";
 	var all_meeting_rooms = <%= raw(@meeting_rooms.collect { |room| room }) %>;
+	var all_meeting_uchastniki = <%= raw(@meeting_uchastniki.collect { |uchastniki| uchastniki }) %>;
 	var all_start_times = <%= raw(@start_time.collect { |time| time }) %>;
 	var all_end_times = <%= raw(@end_time.collect { |time| time }) %>;
 	

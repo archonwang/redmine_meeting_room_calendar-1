@@ -1,10 +1,10 @@
 require 'redmine'
 
 Redmine::Plugin.register :redmine_meeting_room_calendar do
-  name 'Redmine Meeting Room Calendar plugin'
-  author 'QBurst, Tobias Droste'
-  author_url 'https://github.com/dro123/redmine_meeting_room_calendar'
-  description 'This is a plugin for Redmine to see meeting rooms on a particular day on the calendar'
+  name 'RM_meeting_cal_EKT'
+  author 'Ilya S. Gribko'
+  author_url 'https://ekt.by'
+  description 'Бета плагин мероприятий для ЕКТ в рамках реализации ССП в системе Redmine'
   version '3.0.0'
   requires_redmine :version_or_higher => '2.0.0'
 
@@ -17,6 +17,7 @@ Redmine::Plugin.register :redmine_meeting_room_calendar do
                         'custom_field_id_room' => '0',
                         'custom_field_id_start' => '0',
                         'custom_field_id_end' => '0',
+                        'custom_field_id_uchastniki' => '0', #участники мероприятия
                         'show_project_menu' => '1',
                         'show_categories' => '0',
                         'hide_projects' => '1',

@@ -27,6 +27,10 @@
   <%= label_tag('settings[custom_field_id_end]', l(:label_setting_custom_field_id_end)) %>
   <%= select_tag('settings[custom_field_id_end]', options_for_select([['', 0]] + custom_fields_issues.collect{|c| [c.name, c.id]}, (@settings['custom_field_id_end'] || 0))) %>
 </p>
+<p>
+  <%= label_tag('settings[custom_field_id_uchastniki]', l(:label_setting_custom_field_id_uchastniki)) %>
+  <%= select_tag('settings[custom_field_id_uchastniki]', options_for_select([['', 0]] + custom_fields_issues.collect{|c| [c.name, c.id]}, (@settings['custom_field_id_uchastniki'] || 0))) %>
+</p>
 <%- issue_status_ids = IssueStatus.all %>
 <p>
   <%= label_tag('settings[issue_status_id]', l(:label_setting_issue_status_id)) %>

@@ -11,6 +11,7 @@
   var eventsJSON = [];
   var current_room_index = 0;
 
+
   jQuery(document).ready(function($) {
       if (!window.console)
           console = {
@@ -89,6 +90,7 @@
           // building events json for fullcalendar
           for (var i = 0; i < count; i++) {
               var eventIndexRoom = 0;
+              var eventIndexUchastniki = 0;
               var eventIndexStart = 1;
               var eventIndexEnd = 5;
               if (event[i].custom_fields == undefined) {
@@ -102,6 +104,8 @@
                       eventIndexStart = j;
                   if (event[i].custom_fields[j]["id"] == fieldIdEnd)
                       eventIndexEnd = j;
+                  if (event[i].custom_fields[j]["id"] == fieldIdUchastniki)
+                      eventIndexUchastniki = j;
               }
 
               var eventClassName = '';
@@ -110,6 +114,7 @@
               var start_time_arr = event[i].custom_fields[eventIndexStart].value.split(':');
               var end_time_arr = event[i].custom_fields[eventIndexEnd].value.split(':');
               var meeting_room = event[i].custom_fields[eventIndexRoom].value;
+              var meeting_uchastniki = event[i].custom_fields[eventIndexUchastniki].value;
               var start_time = window.moment(event[i].start_date);
               start_time.hours(start_time_arr[0]);
               start_time.minutes(start_time_arr[1]);
@@ -139,6 +144,7 @@
               eventClassName = 'category_' + category_id;
               eventClassName = eventClassName + ' tracker_status_' + event[i].status.id;
               eventClassName = eventClassName + ' meeting_room_' + getRoomClass(meeting_room);
+              eventClassName = eventClassName + ' meeting_uchastniki_' + getUchastnikiClass(meeting_uchastniki);
               if (isCurrentUser(event[i].author.id, assigned_to_id)) {
                   eventClassName = eventClassName + ' myEvents ' + eventClassName;
               }
@@ -148,6 +154,7 @@
                   start : start_time,
                   end : end_time,
                   meeting_room : meeting_room,
+                  meeting_uchastniki : meeting_uchastniki,
                   subject : event[i].subject,
                   event_id : event_id,
                   event_author_id : event[i].author.id,
@@ -170,11 +177,20 @@
           
           return 0;
       };
+      var getUchastnikiClass = function(meeting_uchastniki) {
+          var index = all_meeting_uchastniki.indexOf(meeting_uchastniki);
+          if (index >= 0) {
+              return index + 1;
+          }
+          
+          return 0;
+      };
+
       /*
       Author: shiju@qburst.com
       Description: checking whether event overlaps with exisiting events
       */
-      var isOverlapping = function(event_id, meeting_room, eventStart, eventEnd, periodtype, period) {
+      var isOverlapping = function(event_id, meeting_room, meeting_uchastniki, eventStart, eventEnd, periodtype, period) {
           if (allow_overlap == 1) {
 	      return false;
 	  }
@@ -214,6 +230,10 @@
                       continue;
                   }
                   
+                  if (meeting_uchastniki != events[i].meeting_uchastniki) {
+                      continue;
+                  }
+
                   if (events[i].start == undefined || events[i].end == undefined) {
                       continue;
                   } 
@@ -328,14 +348,16 @@
               axisFormat: long_time_format.replace(/HH/g, 'H').replace(/:mm/g, '(:mm)').replace(/ A/g, 't'),
               eventRender : function(event, element) {
                   var full_text = '<p>';
+                  if (show_categories=='1') {
+                      full_text = full_text + langCategory + ': ' + event.category_name + '<br />';
+                  }
                   full_text = full_text + langRoom + ': ' + event.meeting_room + '<br />';
-                  full_text = full_text + langAssignedTo + ': ' + event.assigned_to_name + '<br />';
                   full_text = full_text + langBookedBy + ': ' + event.author + '<br />';
+                  full_text = full_text + langUchastniki + ': ' + event.meeting_uchastniki + '<br />';
+                  //full_text = full_text + langAssignedTo + ': ' + event.assigned_to_name + '<br />';
                   full_text = full_text + langStartTime + ': ' + event.start.format(long_time_format) + '<br/>';
                   full_text = full_text + langEndTime + ': ' + event.end.format(long_time_format);
-                  if (show_categories=='1') {
-                      full_text = full_text + '<br/>' + langCategory + ': ' + event.category_name;
-                  }
+                  
                   if (show_ticket_id=='1') {
                       full_text = full_text + '<br/><a href="' + baseUrl + '/issues/' + event.event_id + '">' + tracker_name + ' #' + event.event_id + '</a>';
                   }
@@ -383,7 +405,7 @@
                       }
                   });
               },
-              eventClick : function(calEvent, jsEvent, view) {
+              /*eventClick : function(calEvent, jsEvent, view) {
                   if ("Anonymous" == $('#user_name').val() || "Anonym" == $('#user_name').val()) {
                       console.log('User not logged in');
                       return false;
@@ -417,6 +439,7 @@
                   } else {
                       $('#selected_meeting_room_container').hide();
                   }
+                  $('#category_id').val(calEvent.category_id);
                   $('#meeting_date').val(calEvent.start.format(long_date_format));
                   $('#meeting_end_date').val(calEvent.end.format(long_date_format));
                   $('#subject').val(calEvent.subject);
@@ -424,9 +447,9 @@
                   $('#start_time').val(calEvent.start.format('HH:mm'));
                   setEndTime();
                   $('#end_time').val(calEvent.end.format('HH:mm'));
-                  $('#assigned_to_id').val(calEvent.assigned_to_id);
-                  $('#category_id').val(calEvent.category_id);
-                  $('.saveMeetingModal').dialog({
+                  //$('#assigned_to_id').val(calEvent.assigned_to_id);
+                  $('#selected_meeting_uchastniki').val(calEvent.meeting_uchastniki);
+                                    $('.saveMeetingModal').dialog({
                       title : langUpdateEvent,
                       modal : true,
                       resizable : false,
@@ -499,7 +522,7 @@
                   $('#delete_meeting').hide();
                   $('#subject').focus();
                   setEndTime();                  
-              },
+              }, */
               eventOverlap: function(stillEvent, movingEvent) {
 		  if (allow_overlap == 1) {
 		      return true;
@@ -594,7 +617,7 @@
               return false;
           } 
           
-          if (isOverlapping(event.event_id, event.meeting_room, event.start, event.end, 0, 0)) {
+          if (isOverlapping(event.event_id, event.meeting_room, event.meeting_uchastniki, event.start, event.end, 0, 0)) {
               console.log('Overlapping');
               if (revertFunc != null) {
                   revertFunc();
@@ -609,6 +632,7 @@
           customData[fieldIdStart] = event.start.format('HH:mm');
           customData[fieldIdEnd] = event.end.format('HH:mm');
           customData[fieldIdRoom] = event.meeting_room;
+          customData[fieldIdUchastniki] = event.meeting_uchastniki;
           var category_id = 0;
           if (show_categories == '1')
               category_id = event.category_id;
@@ -645,7 +669,7 @@
           });
           
           return true;
-      };
+      }; 
 
       /*
       Author: shiju@qburst.com
@@ -829,6 +853,7 @@
           customData[fieldIdStart] = date.format('HH:mm');
           customData[fieldIdEnd] = date_end.format('HH:mm');
           customData[fieldIdRoom] = $('#selected_meeting_room').val();
+          customData[fieldIdUchastniki] = $('#selected_meeting_uchastniki').val();
           var category_id = 0;
           if (show_categories == '1')
             category_id = $('#category_id').val();
